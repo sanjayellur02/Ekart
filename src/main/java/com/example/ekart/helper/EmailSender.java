@@ -84,4 +84,33 @@ public class EmailSender {
             System.err.println("❌ Customer mail failed, OTP printed in console");
         }
     }
+    // ===================== SEND ORDER CONFIRMATION =====================
+   // USE THIS SIGNATURE
+public void sendOrderConfirmation(Customer customer, double amount, int orderId) {
+    String email = customer.getEmail();
+    String name = customer.getName();
+
+    try {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setFrom("dwarakeeshtalavar@gmail.com", "Ekart Shop");
+        helper.setTo(email);
+        helper.setSubject("Order Confirmed! 🛍️ - Order #" + orderId);
+
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("orderId", orderId);
+        context.setVariable("amount", amount);
+
+        String html = templateEngine.process("order-email.html", context);
+        helper.setText(html, true);
+
+        mailSender.send(message);
+        System.out.println("✅ Email sent successfully!");
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
 }
+    }
+

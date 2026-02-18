@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.razorpay.Order;
 import com.example.ekart.dto.Cart;
 import com.example.ekart.dto.Customer;
 import com.example.ekart.dto.Item;
@@ -56,6 +57,9 @@ public class EkartController {
 
 	@Autowired
 	CustomerRepository customerRepository;
+
+	@Autowired
+    com.example.ekart.helper.EmailSender emailSender; // Add this line
 
 	@GetMapping
 	public String loadHomePage() {
@@ -240,9 +244,25 @@ public String removeFromCart(@PathVariable int id, HttpSession session) {
 	}
 
 	@PostMapping("/success")
-	public String paymentSuccess(com.example.ekart.dto.Order order, HttpSession session) {
-		return customerService.paymentSuccess(order,session);
-	}
+    public String paymentSuccess(com.example.ekart.dto.Order order, HttpSession session) {
+    // 1. Let the service save the order first
+    String result = customerService.paymentSuccess(order, session);
+    
+    // 2. Get the customer from session to get their email
+    Customer customer = (Customer) session.getAttribute("customer");
+    
+    // 3. Trigger the email task
+    if (customer != null && result.contains("home")) { 
+        try {
+            // Passing customer, total amount, and order ID
+            emailSender.sendOrderConfirmation(customer, order.getAmount(), order.getId());
+        } catch (Exception e) {
+            System.err.println("Order email failed but order was successful.");
+        }
+    }
+    
+    return result;
+}
 	@GetMapping("/view-orders")
 	public String viewOrders(HttpSession session, ModelMap map) {
 		return customerService.viewOrders(session,map);

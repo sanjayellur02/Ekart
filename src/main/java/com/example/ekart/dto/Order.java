@@ -60,6 +60,21 @@ public class Order {
 	public void setItems(List<Item> items) {
 		this.items = items;
 	}
+	public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	List<Item> items = new ArrayList<Item>();
 	@ManyToOne

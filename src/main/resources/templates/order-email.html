@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .container { font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; }
+        .header { color: #28a745; font-size: 24px; font-weight: bold; }
+        .details { margin-top: 20px; border-top: 2px solid #eee; padding-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Order Confirmed!</div>
+        <p>Hi <span th:text="${name}">Customer</span>,</p>
+        <p>Your order has been placed successfully. Thank you for shopping with us!</p>
+        
+        <div class="details">
+            <p><strong>Order ID:</strong> #<span th:text="${orderId}">000</span></p>
+            <p><strong>Total Paid:</strong> ₹<span th:text="${amount}">0.00</span></p>
+        </div>
+        
+        <p>We will notify you once your items are out for delivery.</p>
+        <p>Regards,<br><strong>Ekart Team</strong></p>
+    </div>
+</body>
+</html>

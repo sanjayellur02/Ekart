@@ -61,19 +61,19 @@ public class Order {
 		this.items = items;
 	}
 	public double getAmount() {
-        return amount;
+		return totalPrice;
     }
 
     public void setAmount(double amount) {
-        this.amount = amount;
+		this.totalPrice = amount;
     }
 
     public LocalDateTime getDateTime() {
-        return dateTime;
+		return orderDate;
     }
 
     public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+		this.orderDate = dateTime;
     }
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	List<Item> items = new ArrayList<Item>();

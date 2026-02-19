@@ -1,13 +1,8 @@
 package com.example.ekart.controller;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -16,23 +11,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.razorpay.Order;
-import com.example.ekart.dto.Cart;
 import com.example.ekart.dto.Customer;
-import com.example.ekart.dto.Item;
 import com.example.ekart.dto.Product;
 import com.example.ekart.dto.Vendor;
-import com.example.ekart.helper.CloudinaryHelper;
 import com.example.ekart.repository.CustomerRepository;
 import com.example.ekart.repository.ItemRepository;
 import com.example.ekart.repository.OrderRepository;
-import com.example.ekart.repository.ProductRepository;
 import com.example.ekart.service.AdminService;
 import com.example.ekart.service.CustomerService;
 import com.example.ekart.service.VendorService;
-import com.razorpay.Order;
-import com.razorpay.RazorpayClient;
-import com.razorpay.RazorpayException;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;

@@ -19,12 +19,19 @@ public class CloudinaryHelper {
 	@Value("${cloudinary.secret}")
 	private String secret;
 
-	public String saveToCloudinary(MultipartFile file) throws IOException {
-		Cloudinary cloudinary = new Cloudinary("cloudinary://" + key + ":" + secret + "@" + cloudname + "");
-		Map<String, Object> uploadOptions = new HashMap<>();
-		uploadOptions.put("folder", "Products");
-		Map map = cloudinary.uploader().upload(file.getBytes(), uploadOptions);
-		return (String) map.get("url");
-	}
+	// 🔥 Add this annotation to hide the warning from the library's raw Map
+@SuppressWarnings("rawtypes")
+public String saveToCloudinary(MultipartFile file) throws IOException {
+    Cloudinary cloudinary = new Cloudinary("cloudinary://" + key + ":" + secret + "@" + cloudname + "");
+    Map<String, Object> uploadOptions = new HashMap<>();
+    uploadOptions.put("folder", "Products");
+
+    // The library returns a raw Map, so we use it here
+    Map map = cloudinary.uploader().upload(file.getBytes(), uploadOptions);
+
+    // Get the URL and return it
+    return (String) map.get("url");
+
+}
 
 }

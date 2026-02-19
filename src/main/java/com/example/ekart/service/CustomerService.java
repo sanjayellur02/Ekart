@@ -119,11 +119,13 @@ public class CustomerService {
     }
 
     public String loadCustomerHome(HttpSession session) {
+        itemRepository.deleteAll();
         if (session.getAttribute("customer") != null)
             return "customer-home.html";
 
         session.setAttribute("failure", "Login First");
         return "redirect:/customer/login";
+        
     }
 
     // ---------------- VIEW PRODUCTS ----------------
@@ -269,19 +271,33 @@ public class CustomerService {
     }
 
     // ---------------- REMOVE FROM CART ----------------
-    public String removeFromCart(int id, HttpSession session) {
-        Item item = itemRepository.findById(id).orElseThrow();
-        Product product = productRepository.findByNameContainingIgnoreCase(item.getName()).get(0);
-
+    @Transactional
+public String removeFromCart(int id, HttpSession session) {
+    // 1. Fetch the Item (the biscuit)
+    Item item = itemRepository.findById(id).orElseThrow();
+    
+    // 2. Fetch the Product safely (in case it was deleted by vendor)
+    List<Product> products = productRepository.findByNameContainingIgnoreCase(item.getName());
+    if (!products.isEmpty()) {
+        Product product = products.get(0);
         product.setStock(product.getStock() + item.getQuantity());
         productRepository.save(product);
-
-        item.getCart().getItems().removeIf(i -> i.getId() == item.getId());
-        itemRepository.delete(item);
-
-        session.setAttribute("success", "Item Removed from Cart");
-        return "redirect:/view-cart";
     }
+
+    // 3. THE KEY FIX: Don't delete. Just set the cart to null.
+    // This breaks the link so it disappears from the cart UI
+    item.setCart(null); 
+    itemRepository.save(item); 
+
+    // 4. Update the Customer's cart list in the session
+    Customer sessionCustomer = (Customer) session.getAttribute("customer");
+    Customer customer = customerRepository.findById(sessionCustomer.getId()).orElseThrow();
+    customer.getCart().getItems().removeIf(i -> i.getId() == id);
+    customerRepository.save(customer);
+
+    session.setAttribute("success", "Item Removed from Cart");
+    return "redirect:/view-cart";
+}
 
     // ---------------- PAYMENT PAGE ----------------
     public String payment(HttpSession session, ModelMap map) {
@@ -308,26 +324,32 @@ public class CustomerService {
     }
 
     public String paymentSuccess(Order order, HttpSession session) {
-        Customer customer = (Customer) session.getAttribute("customer");
-        customer = customerRepository.findById(customer.getId()).orElseThrow();
-        
-        order.setCustomer(customer);
-        order.setOrderDate(java.time.LocalDateTime.now());
-        
-        // Copy items from Cart to Order
-        List<Item> orderItems = new ArrayList<>(customer.getCart().getItems());
-        order.setItems(orderItems);
-        
-        orderRepository.save(order);
-        
-        // Clear Cart
-        customer.getCart().getItems().clear();
-        customerRepository.save(customer);
-
-        session.setAttribute("success", "Order Placed Successfully!");
-        return "redirect:/customer/home";
+    Customer sessionCustomer = (Customer) session.getAttribute("customer");
+    Customer customer = customerRepository.findById(sessionCustomer.getId()).orElseThrow();
+    
+    order.setCustomer(customer);
+    order.setOrderDate(java.time.LocalDateTime.now());
+    
+    // 1. Get the items and BREAK THE CART LINK first
+    List<Item> cartItems = new ArrayList<>(customer.getCart().getItems());
+    for (Item item : cartItems) {
+        item.setCart(null); // This is the most important line
+        itemRepository.save(item);
     }
+    
+    // 2. Transfer the items to the Order
+    order.setItems(cartItems);
+    
+    // 3. Clear the Cart list in Java
+    customer.getCart().getItems().clear();
+    
+    // 4. Save everything
+    orderRepository.save(order);
+    customerRepository.save(customer);
 
+    session.setAttribute("success", "Order Placed Successfully!");
+    return "redirect:/customer/home";
+}
     // ---------------- VIEW ORDERS ----------------
     public String viewOrders(HttpSession session, ModelMap map) {
         Customer customer = (Customer) session.getAttribute("customer");

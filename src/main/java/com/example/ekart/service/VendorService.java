@@ -13,11 +13,15 @@ import com.example.ekart.dto.Product;
 import com.example.ekart.dto.Vendor;
 import com.example.ekart.helper.AES;
 import com.example.ekart.helper.CloudinaryHelper;
+import com.example.ekart.repository.ItemRepository;
 import com.example.ekart.repository.ProductRepository;
 import com.example.ekart.repository.VendorRepository;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+
+import com.example.ekart.dto.Item;
+
 
 @Service
 public class VendorService {
@@ -30,6 +34,9 @@ public class VendorService {
 
 	@Autowired
 	private CloudinaryHelper cloudinaryHelper;
+
+	@Autowired
+private ItemRepository itemRepository; // ✅ Lowercase 'i'
 
 	// ---------------- REGISTER ----------------
 	public String loadRegistration(ModelMap map, Vendor vendor) {
@@ -175,16 +182,28 @@ public class VendorService {
 
 	// ---------------- DELETE PRODUCT ----------------
 	public String delete(int id, HttpSession session) {
+    if (session.getAttribute("vendor") == null) {
+        session.setAttribute("failure", "Login First");
+        return "redirect:/vendor/login";
+    }
 
-		if (session.getAttribute("vendor") == null) {
-			session.setAttribute("failure", "Login First");
-			return "redirect:/vendor/login";
-		}
+    // 1. Find product
+    Product product = productRepository.findById(id).orElseThrow();
 
-		productRepository.deleteById(id);
-		session.setAttribute("success", "Product Deleted Successfully");
-		return "redirect:/manage-products";
-	}
+    // 2. Find matching items using the lowercase variable
+    List<Item> items = itemRepository.findByName(product.getName());
+    
+    // 3. Delete them from all carts
+    if (items != null && !items.isEmpty()) {
+        itemRepository.deleteAll(items);
+    }
+
+    // 4. Delete the product
+    productRepository.delete(product);
+
+    session.setAttribute("success", "Product Deleted Successfully");
+    return "redirect:/manage-products";
+}
 
 	// ---------------- EDIT PRODUCT ----------------
 	public String editProduct(int id, ModelMap map, HttpSession session) {

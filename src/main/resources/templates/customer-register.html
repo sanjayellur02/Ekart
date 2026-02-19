@@ -218,10 +218,15 @@
                     <span class="error-message" th:errors="*{mobile}"></span>
                 </div>
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" th:field="*{password}" name="password">
-                    <span class="error-message" th:errors="*{password}"></span>
-                </div>
+    <label for="password">Password</label>
+    <input type="password" class="form-control" id="password" th:field="*{password}" name="password" onkeyup="checkStrength(this.value)">
+    <span class="error-message" th:errors="*{password}"></span>
+    
+    <div class="progress mt-2" style="height: 10px; border-radius: 5px; background-color: #e2e8f0;">
+        <div id="strength-bar" class="progress-bar" role="progressbar" style="width: 0%; transition: width 0.3s ease;"></div>
+    </div>
+    <small id="password-text" class="form-text text-muted">Must be 6+ chars with A, a, 1, @</small>
+</div>  
                 <div class="form-group">
                     <label for="confirmPassword">Confirm Password</label>
                     <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" name="confirmPassword">
@@ -244,6 +249,38 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+function checkStrength(password) {
+    let strength = 0;
+    const bar = document.getElementById('strength-bar');
+    const text = document.getElementById('password-text');
+
+    // Requirement Logic (6+ chars, A, a, 1, @)
+    if (password.length >= 6) strength += 20;            // Length
+    if (/[A-Z]/.test(password)) strength += 20;          // Uppercase
+    if (/[a-z]/.test(password)) strength += 20;          // Lowercase
+    if (/[0-9]/.test(password)) strength += 20;          // Number
+    if (/[@$!%*?&]/.test(password)) strength += 20;      // Special Character
+
+    bar.style.width = strength + '%';
+
+    if (strength === 0) {
+        bar.className = 'progress-bar';
+        text.innerText = 'Strength: None';
+    } else if (strength < 60) {
+        bar.className = 'progress-bar bg-danger';
+        text.innerText = 'Strength: Weak';
+    } else if (strength < 100) {
+        bar.className = 'progress-bar bg-warning';
+        text.innerText = 'Strength: Medium';
+    } else {
+        bar.className = 'progress-bar bg-success';
+        text.innerText = 'Strength: Strong';
+    }
+}
+</script>
+
 </body>
 
 </html>

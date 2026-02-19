@@ -22,8 +22,10 @@ public class Order {
 	private String razorpay_payment_id;
 	private String razorpay_order_id;
 	private double totalPrice;
+	private double amount;
 	@CreationTimestamp
 	private LocalDateTime orderDate;
+	private LocalDateTime dateTime;
 	public Customer getCustomer() {
 		return customer;
 	}
@@ -61,19 +63,19 @@ public class Order {
 		this.items = items;
 	}
 	public double getAmount() {
-		return totalPrice;
+		return amount;
     }
 
     public void setAmount(double amount) {
-		this.totalPrice = amount;
+		this.amount = amount;
     }
 
     public LocalDateTime getDateTime() {
-		return orderDate;
+		return dateTime;
     }
 
     public void setDateTime(LocalDateTime dateTime) {
-		this.orderDate = dateTime;
+		this.dateTime = dateTime;
     }
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	List<Item> items = new ArrayList<Item>();

@@ -251,7 +251,8 @@ public String paymentSuccess(com.example.ekart.dto.Order order,
     if (customer != null && result.contains("home")) { 
         try {
             // Pass the 4th argument (paymentMode) here
-            emailSender.sendOrderConfirmation(customer, finalAmount, order.getId(), paymentMode);
+            // Under step 4 in your existing success method:
+emailSender.sendOrderConfirmation(customer, finalAmount, order.getId(), paymentMode, order.getDeliveryTime());
         } catch (Exception e) {
             System.err.println("Email failed: " + e.getMessage());
         }
@@ -262,4 +263,9 @@ public String paymentSuccess(com.example.ekart.dto.Order order,
 	public String viewOrders(HttpSession session, ModelMap map) {
 		return customerService.viewOrders(session,map);
 	}
+
+	@GetMapping("/cancel-order/{id}")
+public String cancelOrder(@PathVariable int id, HttpSession session) {
+    return customerService.cancelOrder(id, session);
+}
 }

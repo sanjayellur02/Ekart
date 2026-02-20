@@ -43,6 +43,15 @@
             <button type="submit" class="btn-pay btn-cod">
                 <i class="fas fa-hand-holding-usd mr-2"></i> Cash on Delivery
             </button>
+            <div class="form-group mt-3 text-left">
+    <label><strong>Select Delivery Slot:</strong></label>
+    <select name="deliveryTime" class="form-control" required>
+        <option value="" disabled selected>Choose a time slot...</option>
+        <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+        <option value="Afternoon (1 PM - 4 PM)">Afternoon (1 PM - 4 PM)</option>
+        <option value="Evening (5 PM - 8 PM)">Evening (5 PM - 8 PM)</option>
+    </select>
+</div>
         </form>
         
         <a href="/view-cart" class="cancel-link">Cancel and Go Back</a>

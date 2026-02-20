@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .container { font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e11d48; border-radius: 10px; }
+        .header { color: #e11d48; font-size: 24px; font-weight: bold; }
+        .details { margin-top: 20px; background: #fff1f2; padding: 15px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Order Cancelled</div>
+        <p>Hi <span th:text="${name}"></span>,</p>
+        <p>Your order has been successfully cancelled as per your request.</p>
+        
+        <div class="details">
+            <p><strong>Order ID:</strong> #<span th:text="${orderId}"></span></p>
+            <p><strong>Refund/Amount Reversed:</strong> ₹<span th:text="${amount}"></span></p>
+        </div>
+        
+        <p>If you did not request this cancellation, please contact our support team immediately.</p>
+        <p>Regards,<br><strong>Ekart Team</strong></p>
+    </div>
+</body>
+</html>

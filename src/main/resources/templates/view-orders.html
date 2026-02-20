@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Orders</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="container mt-5">
+    <h2>Your Orders</h2>
+    <table class="table table-bordered mt-3">
+        <thead>
+    <tr>
+        <th>Order ID</th>
+        <th>Total Amount</th>
+        <th>Date</th>
+        <th>Delivery Slot</th> <th>Action</th>
+    </tr>
+</thead>
+        <tbody>
+    <tr th:each="order : ${orders}">
+        <td th:text="'#' + ${order.id}"></td>
+        <td th:text="'₹ ' + ${order.amount}"></td>
+        <td th:text="${#temporals.format(order.orderDate, 'dd-MMM-yyyy HH:mm')}"></td>
+        
+        <td th:text="${order.deliveryTime}"></td> 
+        
+        <td>
+            <a th:href="@{'/cancel-order/' + ${order.id}}" 
+               class="btn btn-danger btn-sm"
+               onclick="return confirm('Do you really want to cancel this order?')">
+               Cancel Order
+            </a>
+        </td>
+    </tr>
+</tbody>
+    </table>
+    <a href="/customer/home" class="btn btn-primary">Back to Home</a>
+</body>
+</html>

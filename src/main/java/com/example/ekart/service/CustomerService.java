@@ -40,6 +40,9 @@ public class CustomerService {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private com.example.ekart.helper.EmailSender emailSender;
+
     // ---------------- REGISTER ----------------
     public String loadRegistration(ModelMap map, Customer customer) {
         map.put("customer", customer);
@@ -373,4 +376,43 @@ public String removeFromCart(int id, HttpSession session) {
         map.put("orders", orders);
         return "view-orders.html";
     }
+
+    @Transactional
+public String cancelOrder(int id, HttpSession session) {
+    Customer sessionCustomer = (Customer) session.getAttribute("customer");
+    if (sessionCustomer == null) {
+        session.setAttribute("failure", "Login First");
+        return "redirect:/customer/login";
+    }
+
+    // 1. Find the order first
+    Order order = orderRepository.findById(id).orElseThrow();
+    
+    // 2. Save the data we need for the email BEFORE we delete the order
+    double amount = order.getAmount();
+    int orderId = order.getId();
+
+    // 3. Restore stock for each item
+    for (Item item : order.getItems()) {
+        List<Product> products = productRepository.findByNameContainingIgnoreCase(item.getName());
+        if (!products.isEmpty()) {
+            Product product = products.get(0);
+            product.setStock(product.getStock() + item.getQuantity());
+            productRepository.save(product);
+        }
+    }
+
+    // 4. Send the cancellation email
+    try {
+        emailSender.sendOrderCancellation(sessionCustomer, amount, orderId);
+    } catch (Exception e) {
+        System.err.println("Cancellation email failed to send.");
+    }
+
+    // 5. Delete the order from the database
+    orderRepository.delete(order);
+
+    session.setAttribute("success", "Order #" + orderId + " Cancelled Successfully");
+    return "redirect:/view-orders";
+}
 }

@@ -30,6 +30,7 @@ private LocalDateTime dateTime;
     private double totalPrice;
     @CreationTimestamp
     private LocalDateTime orderDate;
+    private String deliveryTime;
 	
 
     public Customer getCustomer() {

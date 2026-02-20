@@ -115,5 +115,41 @@ public void sendOrderConfirmation(Customer customer, double amount, int orderId,
         e.printStackTrace();
     }
 }
+
+public void sendOrderConfirmation(Customer customer, double amount, int orderId, String paymentMode, String deliveryTime) {
+    // ... existing helper code ...
+    Context context = new Context();
+    context.setVariable("deliveryTime", deliveryTime); // Add this line
+    // ... existing process code ...
+}
+
+// ===================== SEND ORDER CANCELLATION =====================
+public void sendOrderCancellation(Customer customer, double amount, int orderId) {
+    String email = customer.getEmail();
+    String name = customer.getName();
+
+    try {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setFrom("dwarakeeshtalavar@gmail.com", "Ekart Shop");
+        helper.setTo(email);
+        helper.setSubject("Order Cancelled ❌ - Order #" + orderId);
+
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("orderId", orderId);
+        context.setVariable("amount", amount);
+
+        // We can reuse the same email logic but point to a different HTML file
+        String html = templateEngine.process("cancel-email.html", context);
+        helper.setText(html, true);
+
+        mailSender.send(message);
+        System.out.println("✅ Cancellation email sent to: " + email);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
     }
 

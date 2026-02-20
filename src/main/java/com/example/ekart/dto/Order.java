@@ -83,8 +83,8 @@ private LocalDateTime dateTime;
         this.dateTime = dateTime;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-List<Item> items = new ArrayList<Item>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER) // Removed orphanRemoval
+private List<Item> items = new ArrayList<Item>();
     @ManyToOne
     Customer customer;
 }

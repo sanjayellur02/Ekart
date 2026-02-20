@@ -1,92 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ekart - Payment</title>
+    <title>Ekart - Payment Options</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        body {
-            background-color: #f8fafc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-        }
-        .payment-card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-        .amount-box {
-            background-color: #f1f5f9;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-        .amount-value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #2563eb;
-        }
-        .btn-confirm {
-            background-color: #2563eb;
-            color: white;
-            font-weight: 600;
-            padding: 12px 20px;
-            border-radius: 8px;
-            width: 100%;
-            border: none;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-        .btn-confirm:hover {
-            background-color: #1e40af;
-        }
-        .cancel-link {
-            display: block;
-            margin-top: 15px;
-            color: #64748b;
-            text-decoration: none;
-        }
-        .cancel-link:hover {
-            color: #334155;
-        }
+        body { background-color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Poppins', sans-serif; margin: 0; }
+        .payment-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; }
+        .amount-box { background-color: #f1f5f9; padding: 15px; border-radius: 10px; margin: 20px 0; }
+        .amount-value { font-size: 28px; font-weight: bold; color: #2563eb; }
+        .btn-pay { font-weight: 600; padding: 12px 20px; border-radius: 8px; width: 100%; border: none; font-size: 16px; transition: 0.3s; margin-bottom: 10px; }
+        .btn-online { background-color: #2563eb; color: white; }
+        .btn-cod { background-color: #10b981; color: white; }
+        .cancel-link { display: block; margin-top: 15px; color: #64748b; text-decoration: none; }
     </style>
 </head>
 <body>
 
     <div class="payment-card">
         <div class="mb-3">
-            <i class="fas fa-wallet fa-4x text-primary"></i>
+            <i class="fas fa-credit-card fa-4x text-primary"></i>
         </div>
-        <h3>Confirm Order</h3>
-        <p class="text-muted">Payment Mode: <strong>Cash on Delivery</strong></p>
+        <h3>Select Payment Method</h3>
         
         <div class="amount-box">
             <div class="text-muted small">Total Payable Amount</div>
-            <div class="amount-value">₹ <span th:text="${amount}">0.0</span></div>
+            <div class="amount-value">₹ <span id="displayAmount" th:text="${amount}">0.0</span></div>
         </div>
 
+        <button id="rzp-button1" class="btn-pay btn-online">
+            <i class="fas fa-globe mr-2"></i> Pay Online
+        </button>
+
         <form action="/success" method="post">
-            <input type="hidden" name="totalPrice" th:value="${amount}">
-            <input type="hidden" name="razorpay_payment_id" value="COD_PAYMENT">
+            <input type="hidden" name="amount" th:value="${amount}">
+            <input type="hidden" name="paymentMode" value="Cash on Delivery">
+            <input type="hidden" name="razorpay_payment_id" value="COD_NA">
             <input type="hidden" name="razorpay_order_id" value="COD_ORDER">
             
-            <button type="submit" class="btn btn-confirm">
-                Place Order <i class="fas fa-arrow-right ml-2"></i>
+            <button type="submit" class="btn-pay btn-cod">
+                <i class="fas fa-hand-holding-usd mr-2"></i> Cash on Delivery
             </button>
         </form>
         
         <a href="/view-cart" class="cancel-link">Cancel and Go Back</a>
     </div>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script th:inline="javascript">
+        var totalAmount = /*[[${amount}]]*/ 0;
+        var customerName = /*[[${customer.name}]]*/ 'Customer';
+        var customerEmail = /*[[${customer.email}]]*/ 'email@example.com';
+
+        document.getElementById('rzp-button1').onclick = function(e){
+            var options = {
+                "key": "YOUR_RAZORPAY_KEY_ID", // Replace with your actual Key ID
+                "amount": totalAmount * 100, // Razorpay works in paise (100 paise = 1 Rupee)
+                "currency": "INR",
+                "name": "Ekart Shop",
+                "description": "Order Payment",
+                "handler": function (response){
+                    // This function runs AFTER successful online payment
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/success';
+
+                    var fields = {
+                        'amount': totalAmount,
+                        'paymentMode': 'Online',
+                        'razorpay_payment_id': response.razorpay_payment_id,
+                        'razorpay_order_id': response.razorpay_order_id
+                    };
+
+                    for (var key in fields) {
+                        var input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = fields[key];
+                        form.appendChild(input);
+                    }
+
+                    document.body.appendChild(form);
+                    form.submit();
+                },
+                "prefill": {
+                    "name": customerName,
+                    "email": customerEmail
+                },
+                "theme": { "color": "#2563eb" }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+            e.preventDefault();
+        }
+    </script>
 </body>
 </html>

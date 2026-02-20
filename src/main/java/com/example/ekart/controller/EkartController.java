@@ -231,23 +231,31 @@ public String removeFromCart(@PathVariable int id, HttpSession session) {
 	}
 
 	@PostMapping("/success")
-    public String paymentSuccess(com.example.ekart.dto.Order order, HttpSession session) {
-    // 1. Let the service save the order first
-    String result = customerService.paymentSuccess(order, session);
+public String paymentSuccess(com.example.ekart.dto.Order order, 
+                             @RequestParam String paymentMode, // Captures mode from form
+                             HttpSession session) {
     
-    // 2. Get the customer from session to get their email
     Customer customer = (Customer) session.getAttribute("customer");
     
-    // 3. Trigger the email task
-    if (customer != null && result.contains("home")) { 
-        try {
-            // Passing customer, total amount, and order ID
-            emailSender.sendOrderConfirmation(customer, order.getAmount(), order.getId());
-        } catch (Exception e) {
-            System.err.println("Order email failed but order was successful.");
+    // Calculate final amount before the cart is cleared by the service
+    double finalAmount = 0;
+    if (customer != null && customer.getCart() != null) {
+        for (com.example.ekart.dto.Item item : customer.getCart().getItems()) {
+            finalAmount += item.getPrice();
         }
     }
+
+    order.setAmount(finalAmount);
+    String result = customerService.paymentSuccess(order, session);
     
+    if (customer != null && result.contains("home")) { 
+        try {
+            // Pass the 4th argument (paymentMode) here
+            emailSender.sendOrderConfirmation(customer, finalAmount, order.getId(), paymentMode);
+        } catch (Exception e) {
+            System.err.println("Email failed: " + e.getMessage());
+        }
+    }
     return result;
 }
 	@GetMapping("/view-orders")

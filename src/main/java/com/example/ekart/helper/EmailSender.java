@@ -86,7 +86,9 @@ public class EmailSender {
     }
     // ===================== SEND ORDER CONFIRMATION =====================
    // USE THIS SIGNATURE
-public void sendOrderConfirmation(Customer customer, double amount, int orderId) {
+// ===================== SEND ORDER CONFIRMATION =====================
+    // In EmailSender.java
+public void sendOrderConfirmation(Customer customer, double amount, int orderId, String paymentMode) {
     String email = customer.getEmail();
     String name = customer.getName();
 
@@ -102,12 +104,13 @@ public void sendOrderConfirmation(Customer customer, double amount, int orderId)
         context.setVariable("name", name);
         context.setVariable("orderId", orderId);
         context.setVariable("amount", amount);
+        // 🔥 Add this variable for the HTML template
+        context.setVariable("paymentMode", paymentMode); 
 
         String html = templateEngine.process("order-email.html", context);
         helper.setText(html, true);
 
         mailSender.send(message);
-        System.out.println("✅ Email sent successfully!");
     } catch (Exception e) {
         e.printStackTrace();
     }

@@ -22,8 +22,7 @@ public class Cart {
 	@OneToMany(
     mappedBy = "cart",
     cascade = CascadeType.ALL,
-    fetch = FetchType.EAGER,
-    orphanRemoval = true // 👈 Add this line here
+    fetch = FetchType.EAGER
 )
 private List<Item> items = new ArrayList<>();
 }

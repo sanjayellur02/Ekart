@@ -13,13 +13,19 @@
         <p>Hi <span th:text="${name}">Customer</span>,</p>
         <p>Your order has been placed successfully. Thank you for shopping with us!</p>
         
-        <div class="details">
-            <p><strong>Order ID:</strong> #<span th:text="${orderId}">000</span></p>
-            <p><strong>Total Paid:</strong> ₹<span th:text="${amount}">0.00</span></p>
-        </div>
+        <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px;">
+    <p><strong>Order ID:</strong> #<span th:text="${orderId}"></span></p>
+    
+    <p th:if="${paymentMode == 'Online'}"><strong>Total Paid:</strong> ₹<span th:text="${amount}"></span></p>
+    <p th:if="${paymentMode == 'Cash on Delivery'}"><strong>Total to be Paid:</strong> ₹<span th:text="${amount}"></span></p>
+    
+    <p><strong>Payment Mode:</strong> <span th:text="${paymentMode}"></span></p>
+</div>
         
         <p>We will notify you once your items are out for delivery.</p>
         <p>Regards,<br><strong>Ekart Team</strong></p>
     </div>
+
+
 </body>
 </html>

@@ -453,30 +453,20 @@ public List<Product> getProductsByCategory(String category, String currentName) 
 // 1. Method to load the address page
 public String loadAddressPage(HttpSession session, ModelMap map) {
     Customer sessionCustomer = (Customer) session.getAttribute("customer");
-    if (sessionCustomer == null) {
-        return "redirect:/customer/login"; 
-    }
-    // Fetch fresh data to see if an address already exists
+    if (sessionCustomer == null) return "redirect:/customer/login";
+
     Customer customer = customerRepository.findById(sessionCustomer.getId()).orElseThrow();
     map.put("customer", customer);
     return "address-page.html";
 }
-// Paste this at the bottom of CustomerService.java
-public String saveAddress(String address, HttpSession session) {
-    // 1. Get the current customer from the session
-    Customer sessionCustomer = (Customer) session.getAttribute("customer");
-    if (sessionCustomer == null) {
-        return "redirect:/customer/login";
-    }
 
-    // 2. Fetch the full customer object from the database
+public String saveAddress(String address, HttpSession session) {
+    Customer sessionCustomer = (Customer) session.getAttribute("customer");
     Customer customer = customerRepository.findById(sessionCustomer.getId()).orElseThrow();
 
-    // 3. Save the address string to the customer object
-    customer.setAddress(address);
+    customer.setAddress(address); // Sets the simple String
     customerRepository.save(customer);
 
-    // 4. Redirect to the payment page
-    return "redirect:/payment";
+    return "redirect:/payment"; 
 }
 }

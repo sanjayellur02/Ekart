@@ -244,11 +244,24 @@
                 </div>
             </div>
         </div>
+        
 
         <div class="text-center mb-5">
-            <h3 class="mb-3">Total : <span th:text="${totalPrice}"></span> ₹</h3>
-            <a href="/payment" class="btn btn-custom btn-lg">Pay Now <i class="fas fa-credit-card ml-2"></i></a>
+    <h3 class="mb-3">Total : <span th:text="${totalPrice}"></span> ₹</h3>
+    
+    <th:block th:if="${totalPrice > 0}">
+        <a href="/payment" class="btn btn-custom btn-lg">
+            Pay Now <i class="fas fa-credit-card ml-2"></i>
+        </a>
+    </th:block>
+
+    <th:block th:unless="${totalPrice > 0}">
+        <div class="alert alert-info d-inline-block">
+            <i class="fas fa-shopping-basket mr-2"></i>
+            Your cart is empty. Add products to enable payment.
         </div>
+    </th:block>
+</div>
         
         <div class="text-center mt-2">
             <a href="/customer/home" class="btn-link"><i class="fas fa-arrow-left mr-2"></i>Back to Dashboard</a>

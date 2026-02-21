@@ -313,27 +313,33 @@ public String removeFromCart(int id, HttpSession session) {
 
     // ---------------- PAYMENT PAGE ----------------
     public String payment(HttpSession session, ModelMap map) {
-        Customer customer = (Customer) session.getAttribute("customer");
-        if (customer == null) {
-            session.setAttribute("failure", "Login First");
-            return "redirect:/customer/login";
-        }
-        
-        customer = customerRepository.findById(customer.getId()).orElseThrow();
-        List<Item> items = customer.getCart().getItems();
-        
-        double amount = 0;
-        if(items != null) {
-            for (Item item : items) {
-                amount += item.getPrice();
-            }
-        }
-        
-        map.put("amount", amount);
-        map.put("customer", customer);
-        
-        return "payment.html";
+    Customer customer = (Customer) session.getAttribute("customer");
+    if (customer == null) {
+        session.setAttribute("failure", "Login First");
+        return "redirect:/customer/login";
     }
+    
+    customer = customerRepository.findById(customer.getId()).orElseThrow();
+    List<Item> items = customer.getCart().getItems();
+    
+    // 🔥 ADD THIS SECURITY CHECK:
+    if (items == null || items.isEmpty()) {
+        session.setAttribute("failure", "Your cart is empty! Add products before paying.");
+        return "redirect:/view-cart";
+    }
+    
+    double amount = 0;
+    for (Item item : items) {
+        amount += item.getPrice();
+    }
+    
+    map.put("amount", amount);
+    map.put("customer", customer);
+    
+    // Add recommendations logic here as well if needed
+    
+    return "payment.html";
+}
 
     // ---------------- PAYMENT SUCCESS (CLONING LOGIC) ----------------
     public String paymentSuccess(Order order, HttpSession session) {
@@ -432,5 +438,13 @@ public void addReview(int productId, int rating, String comment, HttpSession ses
 
     reviewRepository.save(review);
 }
-
+public List<Product> getProductsByCategory(String category, String currentName) {
+    List<Product> list = productRepository.findByCategoryAndApprovedTrue(category);
+    
+    // 🔥 This removes the "Biscuit" from the recommendation list
+    list.removeIf(p -> p.getName().equalsIgnoreCase(currentName));
+    
+    // Limit to 2 items so it fits nicely in your col-6 layout
+    return list.size() > 2 ? list.subList(0, 2) : list;
+}
 }

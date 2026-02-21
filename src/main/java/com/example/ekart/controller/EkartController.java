@@ -24,6 +24,7 @@ import com.example.ekart.service.VendorService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+
 @Controller
 public class EkartController {
 
@@ -226,9 +227,19 @@ public String removeFromCart(@PathVariable int id, HttpSession session) {
 	}
 
 	@GetMapping("/payment")
-	public String payment(HttpSession session, ModelMap map) {
-		return customerService.payment(session,map);
-	}
+public String payment(HttpSession session, ModelMap map) {
+    Customer customer = (Customer) session.getAttribute("customer");
+    if (customer != null && customer.getCart() != null && !customer.getCart().getItems().isEmpty()) {
+        // Get current category and name (e.g., "Cookies" and "Biscuit")
+        String currentCategory = customer.getCart().getItems().get(0).getCategory();
+        String currentName = customer.getCart().getItems().get(0).getName();
+        
+        // Pass both to filter out the duplicate
+        map.put("recommendedProducts", customerService.getProductsByCategory(currentCategory, currentName));
+        map.put("cartItemCategory", currentCategory);
+    }
+    return customerService.payment(session, map);
+}
 
 	@PostMapping("/success")
 public String paymentSuccess(com.example.ekart.dto.Order order, 

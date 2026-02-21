@@ -200,11 +200,25 @@
 
     <div class="container">
         <div class="search-container">
-            <form action="/search-products" method="post">
-                <input th:value="${query}" type="text" name="query" placeholder="Enter Name or Category"
-                    class="search-input">
-                <button class="search-button"><i class="fas fa-search mr-2"></i>Search</button>
-            </form>
+            <div class="search-container">
+    <form action="/search-products" method="post" id="searchForm">
+        <div class="position-relative mb-3">
+            <input th:value="${query}" type="text" name="query" id="searchInput" 
+                   placeholder="Enter Name or Category" class="search-input mb-0" style="padding-right: 50px;">
+            
+            <button type="button" id="voiceBtn" class="btn btn-link position-absolute" 
+                    style="right: 15px; top: 50%; transform: translateY(-50%); z-index: 10; padding: 0;">
+                <i class="fas fa-microphone text-primary" id="micIcon" style="font-size: 1.2rem;"></i>
+            </button>
+        </div>
+        
+        <p id="voiceStatus" class="small text-muted text-center" style="display: none;">
+            <i class="fas fa-circle text-danger fa-pulse mr-1"></i> Listening...
+        </p>
+
+        <button class="search-button"><i class="fas fa-search mr-2"></i>Search</button>
+    </form>
+</div>
         </div>
         <div th:if="${query}">
             <div th:if="${products}" class="products-container">
@@ -259,6 +273,53 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+    const voiceBtn = document.getElementById('voiceBtn');
+    const micIcon = document.getElementById('micIcon');
+    const searchInput = document.getElementById('searchInput');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const searchForm = document.getElementById('searchForm');
+
+    // Initialize Speech API
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+
+        voiceBtn.addEventListener('click', () => {
+            recognition.start();
+            voiceStatus.style.display = 'block';
+            micIcon.classList.replace('text-primary', 'text-danger');
+        });
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            searchInput.value = transcript; // Maps voice to text
+            
+            voiceStatus.style.display = 'none';
+            micIcon.classList.replace('text-danger', 'text-primary');
+            
+            // Auto-submit after voice is captured
+            searchForm.submit(); 
+        };
+
+        recognition.onspeechend = () => {
+            recognition.stop();
+            voiceStatus.style.display = 'none';
+            micIcon.classList.replace('text-danger', 'text-primary');
+        };
+
+        recognition.onerror = () => {
+            voiceStatus.style.display = 'none';
+            micIcon.classList.replace('text-danger', 'text-primary');
+            alert("Voice search failed. Please try typing manually.");
+        };
+    } else {
+        voiceBtn.style.display = 'none'; // Hide if browser doesn't support it
+    }
+</script>
 </body>
 
 </html>

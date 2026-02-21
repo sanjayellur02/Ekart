@@ -268,4 +268,12 @@ emailSender.sendOrderConfirmation(customer, finalAmount, order.getId(), paymentM
 public String cancelOrder(@PathVariable int id, HttpSession session) {
     return customerService.cancelOrder(id, session);
 }
+
+@PostMapping("/add-review")
+public String addReview(@RequestParam int productId, @RequestParam int rating, 
+                        @RequestParam String comment, HttpSession session) {
+    customerService.addReview(productId, rating, comment, session);
+    return "redirect:/view-products";
+}
+
 }

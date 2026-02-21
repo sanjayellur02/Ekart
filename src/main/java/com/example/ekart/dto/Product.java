@@ -3,12 +3,16 @@ package com.example.ekart.dto;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Transient;
 import lombok.Data;
+
+import jakarta.persistence.CascadeType;
 
 @Data
 @Entity
@@ -42,4 +46,16 @@ public class Product {
 	// Image upload (not stored in DB)
 	@Transient
 	private MultipartFile image;
+
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+private java.util.List<Review> reviews;
+
+public java.util.List<Review> getReviews() {
+    return reviews;
+}
+
+public void setReviews(java.util.List<Review> reviews) {
+    this.reviews = reviews;
+}
+
 }

@@ -14,12 +14,14 @@ import com.example.ekart.dto.Cart;
 import com.example.ekart.dto.Customer;
 import com.example.ekart.dto.Item;
 import com.example.ekart.dto.Product;
+import com.example.ekart.dto.Review;
 import com.example.ekart.dto.Order; 
 import com.example.ekart.helper.AES;
 import com.example.ekart.repository.CustomerRepository;
 import com.example.ekart.repository.ItemRepository;
 import com.example.ekart.repository.OrderRepository;
 import com.example.ekart.repository.ProductRepository;
+import com.example.ekart.repository.ReviewRepository;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
@@ -42,6 +44,8 @@ public class CustomerService {
 
     @Autowired
     private com.example.ekart.helper.EmailSender emailSender;
+
+    @Autowired ReviewRepository reviewRepository;
 
     // ---------------- REGISTER ----------------
     public String loadRegistration(ModelMap map, Customer customer) {
@@ -415,4 +419,18 @@ public String cancelOrder(int id, HttpSession session) {
     session.setAttribute("success", "Order #" + orderId + " Cancelled Successfully");
     return "redirect:/view-orders";
 }
+
+public void addReview(int productId, int rating, String comment, HttpSession session) {
+    Customer customer = (Customer) session.getAttribute("customer");
+    Product product = productRepository.findById(productId).orElseThrow();
+
+    Review review = new Review();
+    review.setRating(rating);
+    review.setComment(comment);
+    review.setCustomerName(customer.getName());
+    review.setProduct(product);
+
+    reviewRepository.save(review);
+}
+
 }

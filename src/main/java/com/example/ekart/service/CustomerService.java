@@ -26,6 +26,7 @@ import com.example.ekart.repository.ReviewRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
+
 @Service
 @Transactional
 public class CustomerService {
@@ -46,6 +47,7 @@ public class CustomerService {
     private com.example.ekart.helper.EmailSender emailSender;
 
     @Autowired ReviewRepository reviewRepository;
+
 
     // ---------------- REGISTER ----------------
     public String loadRegistration(ModelMap map, Customer customer) {
@@ -446,5 +448,35 @@ public List<Product> getProductsByCategory(String category, String currentName) 
     
     // Limit to 2 items so it fits nicely in your col-6 layout
     return list.size() > 2 ? list.subList(0, 2) : list;
+}
+
+// 1. Method to load the address page
+public String loadAddressPage(HttpSession session, ModelMap map) {
+    Customer sessionCustomer = (Customer) session.getAttribute("customer");
+    if (sessionCustomer == null) {
+        return "redirect:/customer/login"; 
+    }
+    // Fetch fresh data to see if an address already exists
+    Customer customer = customerRepository.findById(sessionCustomer.getId()).orElseThrow();
+    map.put("customer", customer);
+    return "address-page.html";
+}
+// Paste this at the bottom of CustomerService.java
+public String saveAddress(String address, HttpSession session) {
+    // 1. Get the current customer from the session
+    Customer sessionCustomer = (Customer) session.getAttribute("customer");
+    if (sessionCustomer == null) {
+        return "redirect:/customer/login";
+    }
+
+    // 2. Fetch the full customer object from the database
+    Customer customer = customerRepository.findById(sessionCustomer.getId()).orElseThrow();
+
+    // 3. Save the address string to the customer object
+    customer.setAddress(address);
+    customerRepository.save(customer);
+
+    // 4. Redirect to the payment page
+    return "redirect:/payment";
 }
 }

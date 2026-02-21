@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekart - Shipping Address</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Poppins', sans-serif; margin: 0; }
+        .address-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 500px; width: 100%; }
+        .icon-box { background-color: #eff6ff; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .form-control { border-radius: 8px; padding: 12px; border: 1px solid #e2e8f0; }
+        .form-control:focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); border-color: #2563eb; }
+        .btn-confirm { background-color: #2563eb; color: white; font-weight: 600; padding: 12px; border-radius: 8px; width: 100%; border: none; transition: 0.3s; }
+        .btn-confirm:hover { background-color: #1e40af; transform: translateY(-2px); }
+        .back-link { display: block; margin-top: 20px; color: #64748b; text-decoration: none; font-size: 0.9rem; }
+        .back-link:hover { color: #2563eb; }
+    </style>
+</head>
+<body>
+
+    <div class="address-card">
+        <div class="icon-box">
+            <i class="fas fa-map-marked-alt fa-2x text-primary"></i>
+        </div>
+        <h3 class="font-weight-bold">Shipping Details</h3>
+        <p class="text-muted mb-4">Please confirm where we should deliver your items.</p>
+
+        <form action="/customer/save-address" method="post" class="text-left">
+            <div class="form-group">
+                <label class="font-weight-bold small text-uppercase text-muted">Full Delivery Address</label>
+                <textarea 
+                    name="address" 
+                    class="form-control" 
+                    rows="4" 
+                    required 
+                    placeholder="House No., Building, Street Name, Landmark, City, Pincode"
+                    th:text="${customer.address}"></textarea>
+            </div>
+
+            <button type="submit" class="btn-confirm mt-3">
+                Confirm & Proceed to Payment <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </form>
+
+        <a href="/view-cart" class="back-link">
+            <i class="fas fa-chevron-left mr-1"></i> Back to Cart
+        </a>
+    </div>
+
+</body>
+</html>

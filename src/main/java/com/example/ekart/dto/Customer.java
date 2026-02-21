@@ -98,6 +98,18 @@ public class Customer {
 		this.verified = verified;
 	}
 
+	// ✅ Add this simple String field
+private String address;
+
+// ✅ Add the Getter and Setter
+public String getAddress() {
+    return address;
+}
+
+public void setAddress(String address) {
+    this.address = address;
+}
+
 	@DecimalMin(value = "6000000000",message = "* Enter Proper Mobile Number")
 	@DecimalMax(value = "9999999999",message = "* Enter Proper Mobile Number")
 	private long mobile;

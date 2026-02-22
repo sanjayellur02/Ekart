@@ -29,7 +29,15 @@
     <h6 class="text-muted small font-weight-bold text-uppercase">
         <i class="fas fa-truck mr-1"></i> Shipping To:
     </h6>
-    <p class="mb-1" th:text="${customer.address}"></p>
+    <p class="mb-1 text-dark font-weight-bold" 
+   th:if="${customer.addresses != null and !customer.addresses.isEmpty()}" 
+   th:text="${customer.addresses.get(customer.addresses.size() - 1).details}">
+</p>
+
+<p class="mb-1 text-danger small" 
+   th:if="${customer.addresses == null or customer.addresses.isEmpty()}">
+   ⚠️ No shipping address found. Please add one.
+</p>
     <a href="/customer/address" class="small text-primary">Change Address</a>
 </div>
         

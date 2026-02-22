@@ -276,16 +276,22 @@ public String addReview(@RequestParam int productId, @RequestParam int rating,
     return "redirect:/view-products";
 }
 
+// Add this mapping to EkartController.java to handle address deletion
+@GetMapping("/customer/delete-address/{id}")
+public String deleteAddress(@PathVariable int id, HttpSession session) {
+    return customerService.deleteAddress(id, session);
+}
+
+// Ensure this existing method is correct
 @GetMapping("/customer/address")
 public String loadAddress(HttpSession session, ModelMap map) {
     return customerService.loadAddressPage(session, map);
 }
 
+// Update the saveAddress mapping to handle the redirect correctly
 @PostMapping("/customer/save-address")
 public String saveAddress(@RequestParam String address, HttpSession session) {
-    // This is line 288 that is currently failing
     return customerService.saveAddress(address, session);
 }
-
 
 }

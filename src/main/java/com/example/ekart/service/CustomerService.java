@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
+import com.example.ekart.dto.Address;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
@@ -17,6 +19,7 @@ import com.example.ekart.dto.Product;
 import com.example.ekart.dto.Review;
 import com.example.ekart.dto.Order; 
 import com.example.ekart.helper.AES;
+import com.example.ekart.repository.AddressRepository;
 import com.example.ekart.repository.CustomerRepository;
 import com.example.ekart.repository.ItemRepository;
 import com.example.ekart.repository.OrderRepository;
@@ -47,6 +50,10 @@ public class CustomerService {
     private com.example.ekart.helper.EmailSender emailSender;
 
     @Autowired ReviewRepository reviewRepository;
+
+    @Autowired
+private AddressRepository addressRepository;
+
 
 
     // ---------------- REGISTER ----------------
@@ -450,23 +457,35 @@ public List<Product> getProductsByCategory(String category, String currentName) 
     return list.size() > 2 ? list.subList(0, 2) : list;
 }
 
-// 1. Method to load the address page
+// Method to load the address page with fresh data
 public String loadAddressPage(HttpSession session, ModelMap map) {
     Customer sessionCustomer = (Customer) session.getAttribute("customer");
     if (sessionCustomer == null) return "redirect:/customer/login";
 
     Customer customer = customerRepository.findById(sessionCustomer.getId()).orElseThrow();
-    map.put("customer", customer);
+    map.put("customer", customer); // This now includes the 'addresses' list
     return "address-page.html";
 }
 
-public String saveAddress(String address, HttpSession session) {
+// Method to save a NEW address to the list
+public String saveAddress(String addressDetails, HttpSession session) {
     Customer sessionCustomer = (Customer) session.getAttribute("customer");
     Customer customer = customerRepository.findById(sessionCustomer.getId()).orElseThrow();
 
-    customer.setAddress(address); // Sets the simple String
+    Address newAddress = new Address();
+    newAddress.setDetails(addressDetails);
+    newAddress.setCustomer(customer);
+    
+    customer.getAddresses().add(newAddress);
     customerRepository.save(customer);
 
-    return "redirect:/payment"; 
+    return "redirect:/customer/address"; 
 }
+
+// Method to delete a specific address
+public String deleteAddress(int id, HttpSession session) {
+    addressRepository.deleteById(id);
+    return "redirect:/customer/address";
+}
+
 }

@@ -2,11 +2,15 @@ package com.example.ekart.dto;
 
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.DecimalMax;
@@ -101,7 +105,9 @@ public class Customer {
 	}
 
 	// ✅ Back to normal: Single String address
-private String address;
+// Add this One-to-Many relationship
+@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<Address> addresses = new ArrayList<>();
 
 public String getAddress() {
     return address;
